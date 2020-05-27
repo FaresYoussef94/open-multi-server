@@ -23,9 +23,17 @@ pipeline{
         stage('Dockerizing'){
             steps{
                 echo("Creating Docker image for build: $BUILD_NUMBER")
-                sh 'docker build -t ${DOCKER_REPO}/${DOCKER_IMAGE}:${BUILD_NUMBER} .'
+                sh 'docker build -t ${DOCKER_REPO}/${DOCKER_IMAGE} .'
                 echo("Pushing docker image to the repository")
-                sh 'docker push ${DOCKER_REPO}/${DOCKER_IMAGE}:${BUILD_NUMBER}'
+                sh 'docker push ${DOCKER_REPO}/${DOCKER_IMAGE}'
+            }
+        }
+
+        stage('Deploy'){
+            steps{
+                echo("Deploying to Kubernetes cluster")
+                sh 'kubectl delete -f kubernetes/'
+                sh 'kubectl apply -f kubernetes/'
             }
         }
 

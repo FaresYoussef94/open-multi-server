@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      component: server
+  template:
+    metadata:
+      labels:
+        component: server
+    spec:
+      containers:
+        - name: server
+          image: faresyoussef/mutli-server
+          ports:
+            - containerPort: 5000
+          env: #Creating environment variables
+            - name: REDIS_HOST #environment variable key
+              value: redis-cluster-ip-service #environment variable value
+            - name: REDIS_PORT
+              value: "6379"
+            - name: PGUSER
+              value: postgres-cluster-ip-service
+            - name: PGHOST
+              value: postgres-cluster-ip-service
+            - name: PGPORT
+              value: "5432"
+            - name: PGDATABASE
+              value: postgres
+            - name: PGPASSWORD
+              valueFrom: #This is used to load the value from secret object: kubectl create secret generic pgpassword —from-literal PGPASSWORD=123456asdf
+                secretKeyRef:
+                  name: pgpassword
+                  key: PGPASSWORD
